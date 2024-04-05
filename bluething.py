@@ -82,6 +82,28 @@ def y_n_choice():
             print("Error:", ve)
         except AttributeError as ve:
             print("Error:", ve)
+def prerequisites():
+    print("""Checking prerequisites...""")
+    if is_debian() & has_sudo_privileges():
+        print("Requirements met.")
+    else:
+        print("Application requires a debian system and sudo privileges .")
+        exit()
+
+
+
+def is_debian():
+    try:
+        with open('/etc/os-release') as f:
+            if 'debian' in f.read().lower():
+                return True
+            else:
+                return False
+    except FileNotFoundError:
+        return False
+
+def has_sudo_privileges():
+    return os.geteuid() == 0
 
 
 def log_setup():
@@ -1367,9 +1389,9 @@ def pam_configure():
 # ======================= Patches & Updates ================================================ Patches & Updates
 # ================================================ Patches & Updates ================================================
 # Patches & Updates ================================================ Patches & Updates =========================
-os.system('touch /etc/motd')
-os.system('touch /etc/issue')
-os.system('touch /etc/issue.net')
+os.system('touch /etc/motd > /dev/null 2>&1')
+os.system('touch /etc/issue > /dev/null 2>&1')
+os.system('touch /etc/issue.net > /dev/null 2>&1')
 file_path_etc_motd = '/etc/motd'
 file_path_etc_issue = '/etc/issue'
 file_path_etc_issue_net = '/etc/issue.net'
@@ -2083,6 +2105,7 @@ def options_for_scanning_or_configuration(option):
 
 def main():
     try:
+        prerequisites()
         if login():
             banner()
             log_setup()
